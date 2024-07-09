@@ -1,23 +1,23 @@
 import express from "express";
 
-//importing routers
+//Importing routers
 import taskHandlerRouter from "./taskHandler";
 import userRouter from "./user";
 import authRouter from "./auth";
 
-//creating router object
+//Creating router object
 const router = express();
 
-//route to handle tasks
+//Route to handle tasks
 router.use("/taskHandler", taskHandlerRouter);
 
-//route to handle user
+//Route to handle user
 router.use("/user", userRouter);
 
-//route to handle user authentication
+//Route to handle user authentication
 router.use("/auth", authRouter);
 
-// route for home
+//Route for home
 router.get("/", (req, res) => {
   res.json({
     msg: "Home",

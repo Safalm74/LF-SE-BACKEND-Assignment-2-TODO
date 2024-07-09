@@ -1,21 +1,5 @@
 //Importing Interface
-import config from "../config";
 import { ITask } from "../interface/task";
-//importing db client
-const { Client } = require('pg');
-var fs = require('fs');
-
-// const client = new Client({
-//   user: config.POSTGRES_USER,
-//   host: 'localhost',
-//   database:config.POSTGRES_DB,
-//   password: config.POSTGRES_PW,
-//   port: config.port,
-// })
-// client.connect(function(err:Error) {
-//   if (err) throw err;
-//   console.log("Connected!");
-// });
 
 //Type for task
 type task = {
