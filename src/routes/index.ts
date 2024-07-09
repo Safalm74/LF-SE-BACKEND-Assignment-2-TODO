@@ -1,6 +1,6 @@
 import express from "express";
 
-//import router for handiling tasks
+//importing routers
 import taskHandlerRouter from "./taskHandler";
 import userRouter from "./user";
 import authRouter from "./auth";
@@ -23,4 +23,5 @@ router.get("/", (req, res) => {
     msg: "Home",
   });
 });
+
 export default router;
