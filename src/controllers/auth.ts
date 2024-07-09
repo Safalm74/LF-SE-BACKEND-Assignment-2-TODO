@@ -9,11 +9,9 @@ export async function login(req: Request, res: Response) {
 
 export async function refreshAccessToken(req: Request, res: Response) {
   const { authorization } = req.headers;
-
   if (!authorization) {
-    throw new Error("Un-Aunthenticated");
+    return res.json({ message: "No token provided" });
   }
-  
   const data = await AuthService.refreshAccessToken(authorization);
   res.json(data);
 }

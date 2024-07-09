@@ -40,41 +40,37 @@ export async function login(body: Pick<IUser, "email" | "password">) {
 }
 
 export async function refreshAccessToken(RefreshToken: string) {
-  try {
-    if (!RefreshToken) {
-      throw new Error("Un-Aunthenticated");
-    }
+  const token = RefreshToken.split(" ");
 
-    const token = RefreshToken.split(" ");
-
-    if (token?.length !== 2 || token[0] !== "Bearer") {
-      throw new Error("Un-Aunthenticated");
-    }
-
+  if (token?.length !== 2 || token[0] !== "Bearer") {
+    return { error: "Un-Aunthenticated" };
+  }
+  try{
     const isValidToken: Pick<IUser, "id" | "email" | "name"> = verify(
       token[1],
-      config.jwt.jwt_secret!,
-      {
-        ignoreExpiration: false,
-      }
+      config.jwt.jwt_secret!
     ) as {
       id: string;
       email: string;
       name: string;
     };
+    if (!isValidToken) {
+      return { error: "Un-Aunthenticated" };
+    }
+    
+  const payload = {
+    id: isValidToken.id,
+    name: isValidToken.name,
+    email: isValidToken.email,
+  };
 
-    const payload = {
-      id: isValidToken.id,
-      name: isValidToken.name,
-      email: isValidToken.email,
-    };
+  const accessToken = await sign(payload, config.jwt.jwt_secret!, {
+    expiresIn: config.jwt.accessTokenExpiryS,
+  });
 
-    const accessToken = await sign(payload, config.jwt.jwt_secret!, {
-      expiresIn: config.jwt.accessTokenExpiryS,
-    });
-
-    return { accessToken: accessToken };
-  } catch (err) {
-    return err;
+  return { accessToken: accessToken };
+  }
+  catch(error){
+    return error;
   }
 }
