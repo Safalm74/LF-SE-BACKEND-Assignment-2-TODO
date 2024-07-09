@@ -8,11 +8,12 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function refreshAccessToken(req: Request, res: Response) {
-    const { headers } = req;
-    if (!headers.authorization) {
-        return (new Error("Un-Aunthenticated"));
-      }
-    console.log("in controller: ",headers.authorization);
-  const data = await AuthService.refreshAccessToken(headers.authorization!);
+  const { authorization } = req.headers;
+
+  if (!authorization) {
+    throw new Error("Un-Aunthenticated");
+  }
+  
+  const data = await AuthService.refreshAccessToken(authorization);
   res.json(data);
 }

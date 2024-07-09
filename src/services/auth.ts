@@ -2,7 +2,7 @@ import config from "../config";
 import { IUser } from "../interface/user";
 import { getUserByEmail } from "./user";
 import bcrypt from "bcrypt";
-import { sign, verify } from "jsonwebtoken";
+import { JsonWebTokenError, sign, verify } from "jsonwebtoken";
 export async function login(body: Pick<IUser, "email" | "password">) {
   const existingUser = getUserByEmail(body.email);
   if (!existingUser) {
@@ -39,36 +39,42 @@ export async function login(body: Pick<IUser, "email" | "password">) {
   };
 }
 
-export async function refreshAccessToken(RefreshToken: String) {
-  if (!RefreshToken) {
-    return new Error("Un-Aunthenticated");
-  }
-  console.log(typeof RefreshToken)
-  const token = RefreshToken.split(" ");
-
-  if (token?.length !== 2 || token[0] !== "Bearer") {
-    return new Error("Un-Aunthenticated");
-  }
-  const isValidToken: Pick<IUser, "id" | "email" | "name"> = verify(
-    token[1],
-    config.jwt.jwt_secret!,
-    {
-      ignoreExpiration: false,
+export async function refreshAccessToken(RefreshToken: string) {
+  try {
+    if (!RefreshToken) {
+      throw new Error("Un-Aunthenticated");
     }
-  ) as {
-    id: string;
-    email: string;
-    name: string;
-  };
-  const payload = {
-    id: isValidToken.id,
-    name: isValidToken.name,
-    email: isValidToken.email,
-  };
-  const accessToken = await sign(payload, config.jwt.jwt_secret!, {
-    expiresIn: config.jwt.accessTokenExpiryS,
-  });
-  return {
-    accessToken: accessToken,
-  };
+
+    const token = RefreshToken.split(" ");
+
+    if (token?.length !== 2 || token[0] !== "Bearer") {
+      throw new Error("Un-Aunthenticated");
+    }
+
+    const isValidToken: Pick<IUser, "id" | "email" | "name"> = verify(
+      token[1],
+      config.jwt.jwt_secret!,
+      {
+        ignoreExpiration: false,
+      }
+    ) as {
+      id: string;
+      email: string;
+      name: string;
+    };
+
+    const payload = {
+      id: isValidToken.id,
+      name: isValidToken.name,
+      email: isValidToken.email,
+    };
+
+    const accessToken = await sign(payload, config.jwt.jwt_secret!, {
+      expiresIn: config.jwt.accessTokenExpiryS,
+    });
+
+    return { accessToken: accessToken };
+  } catch (err) {
+    return err;
+  }
 }

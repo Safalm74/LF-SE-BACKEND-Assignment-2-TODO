@@ -1,6 +1,7 @@
 import { IUser } from "../interface/user";
 
 const users: IUser[] = [];
+
 export function getUserById(id: string) {
   return users.find(({ id: userId }) => {
     return userId === id;
